@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - Lost & Found</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <nav class="navbar">
+        <a href="home.html" class="logo">Lost & Found</a>
+        <a href="home.html">Home</a>
+        <a href="report.html">Report Item</a>
+        <a href="claim.html">Find Items</a>
+        <a href="admin.html" class="active">Admin</a>
+    </nav>
+
+    <main class="page-container">
+        <div class="page-title">
+            <h1>Admin Dashboard</h1>
+            <p>Manage reported items and claim requests</p>
+        </div>
+
+        <div class="stats-grid" id="statsContainer">
+            <div class="stat-card">
+                <h2 id="totalItems">0</h2>
+                <p>Total Items</p>
+            </div>
+            <div class="stat-card">
+                <h2 id="pendingItems">0</h2>
+                <p>Pending Review</p>
+            </div>
+            <div class="stat-card">
+                <h2 id="approvedItems">0</h2>
+                <p>Approved Items</p>
+            </div>
+            <div class="stat-card">
+                <h2 id="totalClaims">0</h2>
+                <p>Total Claims</p>
+            </div>
+        </div>
+
+        <div class="tabs">
+            <button class="tab-btn active" data-tab="items">Reported Items</button>
+            <button class="tab-btn" data-tab="claims">Claim Requests</button>
+        </div>
+
+        <div id="alertContainer"></div>
+
+        <div id="itemsTab" class="tab-content">
+            <table class="admin-table" id="itemsTable">
+                <thead>
+                    <tr>
+                        <th>Item</th>
+                        <th>Category</th>
+                        <th>Location</th>
+                        <th>Date Found</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="itemsTableBody">
+                    <tr><td colspan="6" class="loading">Loading items...</td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div id="claimsTab" class="tab-content" style="display: none;">
+            <table class="admin-table" id="claimsTable">
+                <thead>
+                    <tr>
+                        <th>Claimant</th>
+                        <th>Item</th>
+                        <th>Email</th>
+                        <th>Date</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="claimsTableBody">
+                    <tr><td colspan="6" class="loading">Loading claims...</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </main>
+
+    <div class="modal" id="detailModal">
+        <div class="modal-content">
+            <button class="modal-close" id="closeDetailModal">&times;</button>
+            <div id="detailContent"></div>
+        </div>
+    </div>
+
+    <footer>
+        <p>&copy; 2024 School Lost & Found System</p>
+    </footer>
+
+    <script src="supabase.js"></script>
+    <script src="admin.js"></script>
+</body>
+</html>
