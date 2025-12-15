@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Report Found Item - Lost & Found</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <nav class="navbar">
+        <a href="home.html" class="logo">Lost & Found</a>
+        <a href="home.html">Home</a>
+        <a href="report.html" class="active">Report Item</a>
+        <a href="claim.html">Find Items</a>
+        <a href="admin.html">Admin</a>
+    </nav>
+
+    <main class="page-container">
+        <div class="page-title">
+            <h1>Report a Found Item</h1>
+            <p>Help reunite lost items with their owners by providing details below</p>
+        </div>
+
+        <div class="form-container">
+            <div id="alertContainer"></div>
+            
+            <form id="reportForm">
+                <div class="form-group">
+                    <label for="itemName">Item Name *</label>
+                    <input type="text" id="itemName" name="itemName" placeholder="e.g., Blue Water Bottle" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="category">Category *</label>
+                    <select id="category" name="category" required>
+                        <option value="">Select a category</option>
+                        <option value="Electronics">Electronics</option>
+                        <option value="Clothing">Clothing</option>
+                        <option value="Books">Books & Stationery</option>
+                        <option value="Accessories">Accessories</option>
+                        <option value="Sports">Sports Equipment</option>
+                        <option value="Personal">Personal Items</option>
+                        <option value="Other">Other</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="location">Where was it found? *</label>
+                    <input type="text" id="location" name="location" placeholder="e.g., Library, Room 204" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="dateFound">Date Found *</label>
+                    <input type="date" id="dateFound" name="dateFound" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="description">Description *</label>
+                    <textarea id="description" name="description" placeholder="Provide a detailed description of the item including color, brand, distinguishing features, etc." required></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label>Photo (Optional)</label>
+                    <div class="file-upload" id="fileUpload">
+                        <input type="file" id="itemPhoto" name="itemPhoto" accept="image/*">
+                        <div class="file-upload-icon">📷</div>
+                        <p>Click to upload or drag and drop</p>
+                        <p style="font-size: 12px; margin-top: 5px;">PNG, JPG up to 5MB</p>
+                    </div>
+                    <img id="imagePreview" class="image-preview" alt="Preview">
+                </div>
+
+                <div class="form-group">
+                    <label for="finderName">Your Name *</label>
+                    <input type="text" id="finderName" name="finderName" placeholder="Your full name" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="finderEmail">Your Email *</label>
+                    <input type="email" id="finderEmail" name="finderEmail" placeholder="your.email@school.edu" required>
+                </div>
+
+                <button type="submit" class="btn btn-primary" style="width: 100%;">Submit Report</button>
+            </form>
+        </div>
+    </main>
+
+    <footer>
+        <p>&copy; 2024 School Lost & Found System</p>
+    </footer>
+
+    <script src="supabase.js"></script>
+    <script src="report.js"></script>
+</body>
+</html>
