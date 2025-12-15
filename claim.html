@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Find Lost Items - Lost & Found</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <nav class="navbar">
+        <a href="home.html" class="logo">Lost & Found</a>
+        <a href="home.html">Home</a>
+        <a href="report.html">Report Item</a>
+        <a href="claim.html" class="active">Find Items</a>
+        <a href="admin.html">Admin</a>
+    </nav>
+
+    <main class="page-container">
+        <div class="page-title">
+            <h1>Find Your Lost Items</h1>
+            <p>Browse through found items or search for something specific</p>
+        </div>
+
+        <div class="search-bar">
+            <input type="text" id="searchInput" placeholder="Search by item name, category, or location...">
+            <select id="categoryFilter">
+                <option value="">All Categories</option>
+                <option value="Electronics">Electronics</option>
+                <option value="Clothing">Clothing</option>
+                <option value="Books">Books & Stationery</option>
+                <option value="Accessories">Accessories</option>
+                <option value="Sports">Sports Equipment</option>
+                <option value="Personal">Personal Items</option>
+                <option value="Other">Other</option>
+            </select>
+        </div>
+
+        <div id="itemsContainer" class="items-grid">
+            <div class="loading">Loading items...</div>
+        </div>
+    </main>
+
+    <div class="modal" id="claimModal">
+        <div class="modal-content">
+            <button class="modal-close" id="closeModal">&times;</button>
+            <h2 style="color: #473472; margin-bottom: 20px;">Claim This Item</h2>
+            <div id="modalAlertContainer"></div>
+            <form id="claimForm">
+                <input type="hidden" id="claimItemId">
+                <input type="hidden" id="claimItemName">
+                
+                <div class="form-group">
+                    <label for="claimantName">Your Name *</label>
+                    <input type="text" id="claimantName" required placeholder="Your full name">
+                </div>
+
+                <div class="form-group">
+                    <label for="claimantEmail">Your Email *</label>
+                    <input type="email" id="claimantEmail" required placeholder="your.email@school.edu">
+                </div>
+
+                <div class="form-group">
+                    <label for="claimantPhone">Phone Number</label>
+                    <input type="tel" id="claimantPhone" placeholder="Your phone number">
+                </div>
+
+                <div class="form-group">
+                    <label for="claimDescription">Proof of Ownership *</label>
+                    <textarea id="claimDescription" required placeholder="Describe specific details that prove this item belongs to you (unique markings, contents, when/where you lost it, etc.)"></textarea>
+                </div>
+
+                <button type="submit" class="btn btn-primary" style="width: 100%;">Submit Claim</button>
+            </form>
+        </div>
+    </div>
+
+    <footer>
+        <p>&copy; 2024 School Lost & Found System</p>
+    </footer>
+
+    <script src="supabase.js"></script>
+    <script src="claim.js"></script>
+</body>
+</html>
