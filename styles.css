@@ -6,12 +6,20 @@
 
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background-color: #ffffff;
+
     color: #473472;
     min-height: 100vh;
+    background-color: #f4f4f4;
+    background-image: radial-gradient( #473472 1px, transparent 1px),
+                      radial-gradient(white 1px, transparent 1px);
+    background-size: 20px 20px;
+    background-position: 0 0, 10px 10px;
+     cursor:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg'  width='28' height='34' viewport='0 0 100 100' style='fill:black;font-size:17px;'><text y='50%'>👆</text></svg>") 16 0,auto; /*!emojicursor.app*/
 
 
         }
+
+
 
 
   .navbar {
@@ -32,6 +40,14 @@ body {
             backdrop-filter: blur(5px); /* Blur effect */
         }
 
+        .hamburger {
+    display: none;
+    font-size: 2rem;
+    background: none;
+    border: none;
+    cursor: pointer;
+}
+
         .logo {
             font-size: 1.8rem;
             font-weight: bold;
@@ -43,6 +59,7 @@ body {
             display: flex;
         }
 
+
         .nav-links li {
             margin: 0 1rem;
         }
@@ -53,6 +70,26 @@ body {
             font-size: 1rem;
             transition: color 0.3s ease;
         }
+        @media (max-width: 768px) {
+    .nav-links {
+        display: none;
+        flex-direction: column;
+        position: absolute;
+        top: 60px;
+        right: 0;
+        background: white;
+        width: 200px;
+        box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+        padding: 1rem;
+        border-radius: 12px;
+        opacity: 0;
+        transform: translateY(-10px);
+        transition: opacity 0.3s ease, transform 0.3s ease;
+    }
+    .hamburger {
+        display: block;
+    }
+}
 
         .nav-links a:hover {
             color: #473472;
@@ -116,7 +153,11 @@ body {
     max-width: 800px;
     margin: 0 auto;
 }
-
+ .hero h1.top {
+    font-size: 1.5rem; /* Adjust size as needed */
+    font-weight: 400; /* Make it slightly lighter if needed */
+    color: #000;
+}
 .hero h1 {
     font-size: 6rem;
     color: #473472;
@@ -132,12 +173,19 @@ body {
 }
 
 
-.hero p {
-    font-size: 1.2rem;
-    color: #53629E;
-    margin-bottom: 40px;
-    line-height: 1.8;
-}
+
+
+        .hero p {
+            font-size: 1.2rem;
+            font-weight: 400;
+            margin-bottom: 2rem;
+
+        }
+
+        .hero p span {
+            color: #473472;
+            font-weight: 600;
+        }
 
 .hero-buttons {
     display: flex;
@@ -749,4 +797,6 @@ body {
         display: block;
         overflow-x: auto;
     }
+
+
 }
