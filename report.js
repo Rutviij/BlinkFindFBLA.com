@@ -27,7 +27,7 @@ document.addEventListener('DOMContentLoaded', function() {
         e.preventDefault();
         fileUpload.style.borderColor = 'rgba(135, 186, 195, 0.5)';
         fileUpload.style.background = 'transparent';
-        
+
         const files = e.dataTransfer.files;
         if (files.length > 0 && files[0].type.startsWith('image/')) {
             fileInput.files = files;
