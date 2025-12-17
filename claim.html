@@ -3,16 +3,24 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Find Lost Items - Lost & Found</title>
+    <title>BlinkFind</title>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <nav class="navbar">
-        <a href="home.html" class="logo">Lost & Found</a>
-        <a href="index.html">Home</a>
-        <a href="report.html">Report Item</a>
-        <a href="claim.html" class="active">Find Items</a>
-        <a href="admin.html">Admin</a>
+     <nav class="navbar">
+         <div class="logo">BlinkFind</div>
+        <ul class="nav-links">
+            <li><a href="index.html">Home</a></li>
+            <li><a href="claim.html">Claim</a></li>
+            <li><a href="report.html">Report</a></li>
+
+        </ul>
+         <a href="login.html">
+    <button class="hire-me-btn">Admin</button>
+</a>
+        <button class="hamburger" aria-label="Toggle menu">
+      ☰
+    </button>
     </nav>
 
     <main class="page-container">
@@ -48,7 +56,7 @@
             <form id="claimForm">
                 <input type="hidden" id="claimItemId">
                 <input type="hidden" id="claimItemName">
-                
+
                 <div class="form-group">
                     <label for="claimantName">Your Name *</label>
                     <input type="text" id="claimantName" required placeholder="Your full name">
@@ -74,9 +82,30 @@
         </div>
     </div>
 
-    <footer>
-        <p>&copy; 2024 School Lost & Found System</p>
-    </footer>
+    <footer class="footer">
+        <div class="footer-large-text">BlinkFind</div>
+    <div class="footer-container">
+        <div class="footer-column">
+
+
+        </div>
+
+
+         <div class="footer-line"></div>
+        <div class="footer-column">
+            <h3>QUICK LINKS</h3>
+            <a href="claim.html">Claim</a>
+            <a href="report.html">Report</a>
+            <a href="login.html">Admin</a>
+        </div>
+
+
+
+
+
+        <footer class="footer">Programmed and Designed &copy STEM FBLA </footer>
+
+</footer>
 
     <script src="supabase.js"></script>
     <script src="claim.js"></script>
