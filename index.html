@@ -1,9 +1,76 @@
 <!DOCTYPE html>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+    const hamburger = document.querySelector(".hamburger");
+    const navLinks = document.querySelector(".nav-links");
+
+    hamburger.addEventListener("click", function () {
+        if (navLinks.classList.contains("active")) {
+            navLinks.style.opacity = "0";
+            navLinks.style.transform = "translateY(-10px)";
+            setTimeout(() => navLinks.classList.remove("active"), 300);
+        } else {
+            navLinks.classList.add("active");
+            setTimeout(() => {
+                navLinks.style.opacity = "1";
+                navLinks.style.transform = "translateY(0)";
+            }, 10);
+        }
+    });
+});
+
+
+        document.addEventListener("DOMContentLoaded", function() {
+            const words = ["to report found items.", "search for your lost belongings", "reunite with your property."];
+
+            let wordIndex = 0;
+            let charIndex = 0;
+            let isDeleting = false;
+            const typingSpeed = 150;
+            const erasingSpeed = 100;
+            const delayBetweenWords = 1000;
+            const typingText = document.getElementById("typing-text");
+            const cursor = document.getElementById("cursor");
+
+            function typeEffect() {
+                let currentWord = words[wordIndex];
+
+                if (isDeleting) {
+                    typingText.textContent = currentWord.substring(0, charIndex--);
+                } else {
+                    typingText.textContent = currentWord.substring(0, charIndex++);
+                }
+
+                if (!isDeleting && charIndex === currentWord.length) {
+                    isDeleting = true;
+                    setTimeout(typeEffect, delayBetweenWords);
+                } else if (isDeleting && charIndex === 0) {
+                    isDeleting = false;
+                    wordIndex = (wordIndex + 1) % words.length;
+                    setTimeout(typeEffect, typingSpeed);
+                } else {
+                    setTimeout(typeEffect, isDeleting ? erasingSpeed : typingSpeed);
+                }
+            }
+
+            typeEffect();
+
+            // Blinking cursor effect
+            setInterval(() => {
+                cursor.style.opacity = cursor.style.opacity === "0" ? "1" : "0";
+            }, 500);
+        });
+
+         function scrollToSection(sectionId) {
+        document.getElementById(sectionId).scrollIntoView({ behavior: 'smooth' });
+    }
+</script>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Blink Find</title>
+    <title>Lost & Found - School Community</title>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
@@ -11,20 +78,28 @@
     <nav class="navbar">
          <div class="logo">BlinkFind</div>
         <ul class="nav-links">
-            <li><a href="#home">Home</a></li>
-            <li><a href="#about">Claim</a></li>
-            <li><a href="#skills">Report</a></li>
+            <li><a href="index.html">Home</a></li>
+            <li><a href="claim.html">Claim</a></li>
+            <li><a href="report.html">Report</a></li>
         </ul>
-         <button class="hire-me-btn">Admin</button>
+        <a href="login.html">
+    <button class="hire-me-btn">Admin</button>
+</a>
+        <button class="hamburger" aria-label="Toggle menu">
+      ☰
+    </button>
     </nav>
 
     <main class="main-content">
+
         <section class="hero">
+            <h1 class="top">Indroducing</h1>
             <h1>BlinkFind<span></h1>
             <h2>Find it in the blink of an eye!</h2>
             <br>
             <br>
-            <p>A lost and found system making it easy to report found items, search for your lost belongings, and reunite with your property.</p>
+              <p>A lost and found system making it easy <span id="typing-text"></span><span id="cursor">|</span></p>
+
             <div class="hero-buttons">
                 <a href="report.html" class="btn btn-primary">Report Found Item</a>
                 <a href="claim.html" class="btn btn-secondary">Search Lost Items</a>
@@ -65,7 +140,7 @@
             <h3>QUICK LINKS</h3>
             <a href="claim.html">Claim</a>
             <a href="report.html">Report</a>
-            <a href="admin.html">Admin</a>
+            <a href="login.html">Admin</a>
         </div>
 
 
@@ -76,4 +151,6 @@
 
 </footer>
 </body>
+
+
 </html>
