@@ -89,7 +89,7 @@ document.addEventListener('DOMContentLoaded', function() {
         btn.addEventListener('click', () => {
             tabBtns.forEach(b => b.classList.remove('active'));
             btn.classList.add('active');
-            
+
             const tab = btn.dataset.tab;
             document.getElementById('itemsTab').style.display = tab === 'items' ? 'block' : 'none';
             document.getElementById('claimsTab').style.display = tab === 'claims' ? 'block' : 'none';
