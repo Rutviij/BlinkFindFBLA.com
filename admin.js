@@ -1,23 +1,23 @@
 document.addEventListener('DOMContentLoaded', function () {
     const itemsTableBody = document.getElementById('itemsTableBody');
     const alertContainer = document.getElementById('alertContainer');
-
     let allItems = [];
 
     loadData();
 
-    // Fetch all items from backend
+    // Fetch all items from Supabase
     async function loadData() {
         try {
-            allItems = await getAllItems(); // Fetch all items (pending, approved, etc.)
+            allItems = await getAllItems(); // Fetch all items
+            console.log('Fetched items:', allItems); // Debugging: Log fetched items
             renderItems(allItems);
         } catch (error) {
-            console.error('Error loading data:', error);
+            console.error('Error loading items:', error);
             showAlert('Error loading data. Please refresh the page.', 'error');
         }
     }
 
-    // Render the items in the Admin Panel
+    // Render items in the admin table
     function renderItems(items) {
         if (items.length === 0) {
             itemsTableBody.innerHTML =
@@ -30,7 +30,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 <tr>
                     <td>
                         <strong>${escapeHtml(item.name)}</strong>
-                        <br><small style="color: #53629E;">Reported by: ${escapeHtml(item.finder_name)}</small>
+                        <br><small>Reported by: ${escapeHtml(item.finder_name)}</small>
                     </td>
                     <td>${escapeHtml(item.category)}</td>
                     <td>${escapeHtml(item.location)}</td>
@@ -43,11 +43,9 @@ document.addEventListener('DOMContentLoaded', function () {
                     <td>
                         <div class="admin-actions">
                             ${item.status === 'pending' ? `
-                                <button class="btn-small btn-approve"
-                                    onclick="approveItem('${item.id}')">Approve</button>
+                                <button class="btn-small btn-approve" onclick="approveItem('${item.id}')">Approve</button>
                             ` : ''}
-                            <button class="btn-small btn-delete" 
-                                onclick="deleteItemConfirm('${item.id}')">Delete</button>
+                            <button class="btn-small btn-delete" onclick="deleteItemConfirm('${item.id}')">Delete</button>
                         </div>
                     </td>
                 </tr>
@@ -55,25 +53,27 @@ document.addEventListener('DOMContentLoaded', function () {
             .join('');
     }
 
-    // Approve an item (update status to 'approved')
+    // Approve an item
     window.approveItem = async function (id) {
         try {
-            await updateItemStatus(id, 'approved'); // Update the status in Supabase
+            console.log(`Approving item ID: ${id}`); // Debugging: Log approval action
+            await updateItemStatus(id, 'approved'); // Update status in Supabase
             showAlert('Item approved successfully!', 'success');
-            loadData(); // Reload data to refresh UI
+            loadData(); // Reload table data
         } catch (error) {
             console.error('Error approving item:', error);
             showAlert('Error approving item.', 'error');
         }
     };
 
-    // Delete an item (remove completely from Supabase)
+    // Delete an item
     window.deleteItemConfirm = async function (id) {
         if (confirm('Are you sure you want to delete this item?')) {
             try {
+                console.log(`Deleting item ID: ${id}`); // Debugging: Log deletion action
                 await deleteItem(id); // Delete the item in Supabase
                 showAlert('Item deleted successfully!', 'success');
-                loadData(); // Reload data to refresh UI
+                loadData(); // Reload table data
             } catch (error) {
                 console.error('Error deleting item:', error);
                 showAlert('Error deleting item.', 'error');
@@ -81,7 +81,7 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     };
 
-    // Utility function to display alerts
+    // Utility to display alerts
     function showAlert(message, type) {
         alertContainer.innerHTML = `<div class="alert alert-${type}">${message}</div>`;
         setTimeout(() => {
@@ -89,7 +89,7 @@ document.addEventListener('DOMContentLoaded', function () {
         }, 5000);
     }
 
-    // Utility to escape HTML content (prevent injection)
+    // Utility to escape HTML content
     function escapeHtml(text) {
         if (!text) return '';
         const div = document.createElement('div');
