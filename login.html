@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<style>
+    * {
+  box-sizing: border-box;
+  font-family: 'Segoe UI', sans-serif;
+}
+
+body {
+  background: #f4f5fb;
+}
+.navbar {
+            position: fixed;
+            top: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 90%;
+            background: rgba(255, 255, 255, 0.5);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 2rem;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            border-radius: 12px;
+            z-index: 1000;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(5px); /* Blur effect */
+        }
+
+        .hamburger {
+    display: none;
+    font-size: 2rem;
+    background: none;
+    border: none;
+    cursor: pointer;
+}
+
+        .logo {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: #473472;
+        }
+
+        .nav-links {
+            list-style: none;
+            display: flex;
+        }
+
+
+        .nav-links li {
+            margin: 0 1rem;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: #000;
+            font-size: 1rem;
+            transition: color 0.3s ease;
+        }
+        @media (max-width: 768px) {
+    .nav-links {
+        display: none;
+        flex-direction: column;
+        position: absolute;
+        top: 60px;
+        right: 0;
+        background: white;
+        width: 200px;
+        box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+        padding: 1rem;
+        border-radius: 12px;
+        opacity: 0;
+        transform: translateY(-10px);
+        transition: opacity 0.3s ease, transform 0.3s ease;
+    }
+    .hamburger {
+        display: block;
+    }
+}
+
+        .nav-links a:hover {
+            color: #473472;
+        }
+        .hire-me-btn {
+        background: #473472; color: #fff; border: none; padding: 0.5rem 1rem; cursor: pointer; border-radius: 5px; transition: background 0.3s ease;
+         }
+
+        .hire-me-btn:hover {
+        background: #53629E;
+        }
+
+        .login-container {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding-top: 130px;
+  padding-bottom: 130px;
+}
+
+.login-box {
+  background: white;
+  width: 100%;
+  max-width: 420px;
+  padding: 40px;
+  border-radius: 20px;
+  box-shadow: 0 20px 40px rgba(0,0,0,.1);
+  text-align: center;
+}
+
+
+
+.login-title {
+  color: #473472;
+  margin-bottom: 20px;
+}
+
+.form-group {
+  margin-bottom: 18px;
+  text-align: left;
+}
+
+.form-group label {
+  font-weight: 600;
+  color: #473472;
+}
+
+.form-group input {
+  width: 100%;
+  padding: 12px;
+  border-radius: 10px;
+  border: 2px solid #eee;
+}
+
+.btn {
+  width: 100%;
+  padding: 12px;
+  background: #473472;
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.btn:hover {
+  background: #53629E;
+}
+
+.login-error {
+  background: #ffeaea;
+  color: #c62828;
+  padding: 12px;
+  border-radius: 8px;
+  margin-bottom: 15px;
+  display: none;
+}
+
+.login-error.show {
+  display: block;
+}
+
+.remember-forgot {
+  display: flex;
+  justify-content: space-between;
+  font-size: 14px;
+  margin-bottom: 20px;
+}
+
+.hint {
+  font-size: 13px;
+  color: #777;
+  margin-top: 15px;
+}
+
+
+
+
+.footer {
+    background-color: #473472;
+    color: #ffffff;
+    padding: 2rem 8%;
+    text-align: left;
+}
+
+.footer-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: start;
+    flex-wrap: wrap;
+    max-width: 1100px;
+    margin: auto;
+}
+
+.footer-column {
+    flex: 1;
+    min-width: 200px;
+    margin-bottom: 1rem;
+    position: middle;
+}
+
+.footer-column h3 {
+    font-size: 1.2rem;
+    font-weight: bold;
+    margin-bottom: 0.5rem;
+}
+
+.footer-column a {
+    display: block;
+    color: #ffffff;
+    text-decoration: none;
+    margin-bottom: 0.3rem;
+}
+
+.footer-column a:hover {
+    text-decoration: underline;
+}
+
+.footer-line {
+    width: 100%;
+    height: 1px;
+    background: #ffffff;
+    margin: 1.5rem 0;
+}
+
+
+.footer-name {
+    font-size: 1rem;
+    font-weight: bold;
+    margin-bottom: 1rem;
+}
+
+.footer-large-text {
+    font-size: 5rem;
+    font-weight: bold;
+    color: #ffffff;
+    text-align: center;
+    margin-top: 1rem;
+}
+
+.footer-small-text {
+    font-size: 2rem;
+    font-weight: bold;
+    color: #ffffff;
+    text-align: center;
+    }
+
+@media (max-width: 768px) {
+    .navbar {
+        padding: 12px 25px;
+        gap: 20px;
+    }
+
+    .navbar a {
+        font-size: 14px;
+        padding: 6px 12px;
+    }
+
+
+
+
+</style>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Admin Login</title>
+
+  <link rel="stylesheet" href="login.css">
+</head>
+<body>
+
+ <nav class="navbar">
+
+         <div class="logo">BlinkFind</div>
+        <ul class="nav-links">
+            <li><a href="index.html">Home</a></li>
+            <li><a href="claim.html">Claim</a></li>
+            <li><a href="report.html">Report</a></li>
+        </ul>
+        <a href="login.html">
+    <button class="hire-me-btn">Admin</button>
+</a>
+        <button class="hamburger" aria-label="Toggle menu">
+      ☰
+    </button>
+    </nav>
+
+<div class="login-container">
+  <div class="login-box">
+    <div class="login-icon">
+      <i class="fas fa-lock"></i>
+    </div>
+
+    <h1 class="login-title">Admin Login</h1>
+
+    <div class="login-error" id="loginError">
+      <i class="fas fa-exclamation-circle"></i>
+      Invalid username or password.
+    </div>
+
+    <form id="loginForm">
+      <div class="form-group">
+        <label>Username</label>
+        <input type="text" id="username" required>
+      </div>
+
+      <div class="form-group">
+        <label>Password</label>
+        <input type="password" id="password" required>
+      </div>
+
+      <div class="remember-forgot">
+        <label>
+          <input type="checkbox" id="rememberMe">
+          Remember me
+        </label>
+        <a href="#" id="forgotPassword">Forgot password?</a>
+      </div>
+
+      <button type="submit" class="btn">Login</button>
+    </form>
+
+    <p class="hint">Default: <b>admin / school123</b></p>
+  </div>
+</div>
+ <footer class="footer">
+        <div class="footer-large-text">BlinkFind</div>
+    <div class="footer-container">
+        <div class="footer-column">
+
+
+        </div>
+
+
+         <div class="footer-line"></div>
+        <div class="footer-column">
+            <h3>QUICK LINKS</h3>
+            <a href="claim.html">Claim</a>
+            <a href="report.html">Report</a>
+            <a href="login.html">Admin</a>
+        </div>
+
+
+
+
+
+        <footer class="footer">Programmed and Designed &copy STEM FBLA </footer>
+
+</footer>
+
+
+<script src="login.js"></script>
+</body>
+</html>
