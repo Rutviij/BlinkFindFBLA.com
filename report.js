@@ -1,4 +1,4 @@
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     const form = document.getElementById('reportForm');
     const fileUpload = document.getElementById('fileUpload');
     const fileInput = document.getElementById('itemPhoto');
@@ -85,7 +85,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 image_url: imageUrl,
                 finder_name: document.getElementById('finderName').value,
                 finder_email: document.getElementById('finderEmail').value,
-                status: 'pending'
+                status: 'pending', // Default status as 'pending'
             };
 
             await addItem(itemData);
@@ -94,7 +94,6 @@ document.addEventListener('DOMContentLoaded', function() {
             form.reset();
             imagePreview.style.display = 'none';
             dateInput.value = today;
-
         } catch (error) {
             console.error('Error submitting report:', error);
             showAlert('Error submitting report. Please try again.', 'error');
