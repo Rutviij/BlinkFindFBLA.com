@@ -29,8 +29,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
         itemsContainer.innerHTML = items.map(item => `
             <div class="item-card">
-                ${item.image_url 
-                    ? `<img src="${item.image_url}" alt="${item.name}" class="item-image">` 
+                ${item.image_url
+                    ? `<img src="${item.image_url}" alt="${item.name}" class="item-image">`
                     : `<div class="item-image" style="display: flex; align-items: center; justify-content: center; font-size: 50px;">📦</div>`
                 }
                 <div class="item-details">
