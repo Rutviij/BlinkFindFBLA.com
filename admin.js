@@ -1,3 +1,4 @@
+
 document.addEventListener('DOMContentLoaded', function() {
     const tabBtns = document.querySelectorAll('.tab-btn');
     const itemsTableBody = document.getElementById('itemsTableBody');
