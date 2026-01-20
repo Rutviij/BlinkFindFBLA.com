@@ -11,8 +11,8 @@ form.addEventListener("submit", e => {
   const remember = rememberMe.checked;
 
   if (
-    (user === "admin" && pass === "admin") ||
-    (user === "staff" && pass === "school123")
+    (user === "admin" && pass === "school123") ||
+    (user === "staff" && pass === "campus456")
   ) {
     localStorage.setItem("isAdminLoggedIn", "true");
 
