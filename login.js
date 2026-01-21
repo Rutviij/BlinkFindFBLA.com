@@ -27,7 +27,8 @@ form.addEventListener("submit", e => {
     }
 
     // 🔁 REDIRECT
-    window.location.href = "admin.html";
+    window.location.href = "../admin.html";
+
   } else {
     loginAttempts++;
     errorBox.classList.add("show");
