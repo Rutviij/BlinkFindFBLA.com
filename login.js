@@ -3,6 +3,10 @@ let loginAttempts = 0;
 const form = document.getElementById("loginForm");
 const errorBox = document.getElementById("loginError");
 
+const username = document.getElementById("username");
+const password = document.getElementById("password");
+const rememberMe = document.getElementById("rememberMe");
+
 form.addEventListener("submit", e => {
   e.preventDefault();
 
