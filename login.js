@@ -23,7 +23,7 @@ form.addEventListener("submit", e => {
     }
 
     // 🔁 REDIRECT
-    window.location.href = "admin.html";
+    window.location.href = "home.html";
   } else {
     loginAttempts++;
     errorBox.classList.add("show");
