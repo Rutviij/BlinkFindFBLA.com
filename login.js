@@ -19,6 +19,8 @@ form.addEventListener("submit", e => {
     (user === "staff" && pass === "campus456")
   ) {
     localStorage.setItem("isAdminLoggedIn", "true");
+    alert("LOGIN SUCCESS — ABOUT TO REDIRECT");
+  }
 
     if (remember) {
       localStorage.setItem("adminUsername", user);
