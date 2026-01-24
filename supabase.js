@@ -2,238 +2,96 @@
 const SUPABASE_URL = 'https://doovebtkpjvkvuzfxohq.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRvb3ZlYnRrcGp2a3Z1emZ4b2hxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjkyOTAxNDgsImV4cCI6MjA4NDg2NjE0OH0.WUwRsDVZ3lLlG5yWhEP4KxqZpxizouDWkfYxApRhlJ4';
 
-let supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-function initSupabase() {
-    if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
-        console.warn('Supabase credentials not configured. Using local storage fallback.');
-        return null;
-    }
-
-    if (typeof supabase !== 'undefined') {
-        supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-        return supabaseClient;
-    }
-
-    return null;
+// Items
+export async function getAllItems() {
+    const { data, error } = await supabaseClient
+        .from('items')
+        .select('*')
+        .order('created_at', { ascending: false });
+    if (error) throw error;
+    return data;
 }
 
-function getLocalItems() {
-    const items = localStorage.getItem('lostFoundItems');
-    return items ? JSON.parse(items) : [];
+export async function getApprovedItems() {
+    const { data, error } = await supabaseClient
+        .from('items')
+        .select('*')
+        .eq('status', 'approved')
+        .order('created_at', { ascending: false });
+    if (error) throw error;
+    return data;
 }
 
-function saveLocalItems(items) {
-    localStorage.setItem('lostFoundItems', JSON.stringify(items));
+export async function addItem(item) {
+    const { data, error } = await supabaseClient
+        .from('items')
+        .insert([item])
+        .select();
+    if (error) throw error;
+    return data[0];
 }
 
-function getLocalClaims() {
-    const claims = localStorage.getItem('lostFoundClaims');
-    return claims ? JSON.parse(claims) : [];
+export async function updateItemStatus(id, status) {
+    const { data, error } = await supabaseClient
+        .from('items')
+        .update({ status })
+        .eq('id', id)
+        .select();
+    if (error) throw error;
+    return data[0];
 }
 
-function saveLocalClaims(claims) {
-    localStorage.setItem('lostFoundClaims', JSON.stringify(claims));
-}
-
-async function getAllItems() {
-    if (supabaseClient) {
-        const { data, error } = await supabaseClient
-            .from('items')
-            .select('*')
-            .order('created_at', { ascending: false });
-
-        if (error) {
-            console.error('Error fetching items:', error);
-            return getLocalItems();
-        }
-        return data || [];
-    }
-    return getLocalItems();
-}
-
-async function getApprovedItems() {
-    if (supabaseClient) {
-        const { data, error } = await supabaseClient
-            .from('items')
-            .select('*')
-            .eq('status', 'approved')
-            .order('created_at', { ascending: false });
-
-        if (error) {
-            console.error('Error fetching items:', error);
-            return getLocalItems().filter(item => item.status === 'approved');
-        }
-        return data || [];
-    }
-    return getLocalItems().filter(item => item.status === 'approved');
-}
-
-async function addItem(item) {
-    if (supabaseClient) {
-        const { data, error } = await supabaseClient
-            .from('items')
-            .insert([item])
-            .select();
-
-        if (error) {
-            console.error('Error adding item:', error);
-            throw error;
-        }
-        return data[0];
-    }
-
-    const items = getLocalItems();
-    const newItem = {
-        ...item,
-        id: Date.now().toString(),
-        created_at: new Date().toISOString(),
-        status: 'pending'
-    };
-    items.unshift(newItem);
-    saveLocalItems(items);
-    return newItem;
-}
-
-async function updateItemStatus(id, status) {
-    if (supabaseClient) {
-        const { data, error } = await supabaseClient
-            .from('items')
-            .update({ status })
-            .eq('id', id)
-            .select();
-
-        if (error) {
-            console.error('Error updating item:', error);
-            throw error;
-        }
-        return data[0];
-    }
-
-    const items = getLocalItems();
-    const idStr = String(id);
-    const index = items.findIndex(item => String(item.id) === idStr);
-    if (index !== -1) {
-        items[index].status = status;
-        saveLocalItems(items);
-        return items[index];
-    }
-    throw new Error('Item not found');
-}
-
-async function deleteItem(id) {
-    if (supabaseClient) {
-        const { error } = await supabaseClient
-            .from('items')
-            .delete()
-            .eq('id', id);
-
-        if (error) {
-            console.error('Error deleting item:', error);
-            throw error;
-        }
-        return true;
-    }
-
-    const items = getLocalItems();
-    const idStr = String(id);
-    const filtered = items.filter(item => String(item.id) !== idStr);
-    saveLocalItems(filtered);
+export async function deleteItem(id) {
+    const { error } = await supabaseClient
+        .from('items')
+        .delete()
+        .eq('id', id);
+    if (error) throw error;
     return true;
 }
 
-async function addClaim(claim) {
-    if (supabaseClient) {
-        const { data, error } = await supabaseClient
-            .from('claims')
-            .insert([claim])
-            .select();
-
-        if (error) {
-            console.error('Error adding claim:', error);
-            throw error;
-        }
-        return data[0];
-    }
-
-    const claims = getLocalClaims();
-    const newClaim = {
-        ...claim,
-        id: Date.now().toString(),
-        created_at: new Date().toISOString(),
-        status: 'pending'
-    };
-    claims.unshift(newClaim);
-    saveLocalClaims(claims);
-    return newClaim;
+// Claims
+export async function addClaim(claim) {
+    const { data, error } = await supabaseClient
+        .from('claims')
+        .insert([claim])
+        .select();
+    if (error) throw error;
+    return data[0];
 }
 
-async function getAllClaims() {
-    if (supabaseClient) {
-        const { data, error } = await supabaseClient
-            .from('claims')
-            .select('*')
-            .order('created_at', { ascending: false });
-
-        if (error) {
-            console.error('Error fetching claims:', error);
-            return getLocalClaims();
-        }
-        return data || [];
-    }
-    return getLocalClaims();
+export async function getAllClaims() {
+    const { data, error } = await supabaseClient
+        .from('claims')
+        .select('*')
+        .order('created_at', { ascending: false });
+    if (error) throw error;
+    return data;
 }
 
-async function updateClaimStatus(id, status) {
-    if (supabaseClient) {
-        const { data, error } = await supabaseClient
-            .from('claims')
-            .update({ status })
-            .eq('id', id)
-            .select();
-
-        if (error) {
-            console.error('Error updating claim:', error);
-            throw error;
-        }
-        return data[0];
-    }
-
-    const claims = getLocalClaims();
-    const idStr = String(id);
-    const index = claims.findIndex(claim => String(claim.id) === idStr);
-    if (index !== -1) {
-        claims[index].status = status;
-        saveLocalClaims(claims);
-        return claims[index];
-    }
-    throw new Error('Claim not found');
+export async function updateClaimStatus(id, status) {
+    const { data, error } = await supabaseClient
+        .from('claims')
+        .update({ status })
+        .eq('id', id)
+        .select();
+    if (error) throw error;
+    return data[0];
 }
 
-async function uploadImage(file) {
-    if (supabaseClient) {
-        const fileName = `${Date.now()}-${file.name}`;
-        const { data, error } = await supabaseClient.storage
-            .from('item-images')
-            .upload(fileName, file);
+// Images
+export async function uploadImage(file) {
+    const fileName = `${Date.now()}-${file.name}`;
+    const { data, error } = await supabaseClient.storage
+        .from('item-images')
+        .upload(fileName, file);
+    if (error) throw error;
 
-        if (error) {
-            console.error('Error uploading image:', error);
-            throw error;
-        }
+    const { data: urlData } = supabaseClient.storage
+        .from('item-images')
+        .getPublicUrl(fileName);
 
-        const { data: urlData } = supabaseClient.storage
-            .from('item-images')
-            .getPublicUrl(fileName);
-
-        return urlData.publicUrl;
-    }
-
-    return new Promise((resolve) => {
-        const reader = new FileReader();
-        reader.onloadend = () => resolve(reader.result);
-        reader.readAsDataURL(file);
-    });
+    return urlData.publicUrl;
 }
-
-initSupabase();
