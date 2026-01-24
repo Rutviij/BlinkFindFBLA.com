@@ -1,5 +1,5 @@
-const SUPABASE_URL = window.SUPABASE_URL || '';
-const SUPABASE_ANON_KEY = window.SUPABASE_ANON_KEY || '';
+const SUPABASE_URL = window.SUPABASE_URL || 'https://doovebtkpjvkvuzfxohq.supabase.co';
+const SUPABASE_ANON_KEY = window.SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRvb3ZlYnRrcGp2a3Z1emZ4b2hxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjkyOTAxNDgsImV4cCI6MjA4NDg2NjE0OH0.WUwRsDVZ3lLlG5yWhEP4KxqZpxizouDWkfYxApRhlJ4';
 
 let supabaseClient = null;
 
