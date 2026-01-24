@@ -1,4 +1,11 @@
 document.addEventListener('DOMContentLoaded', function() {
+    // 🔒 Admin login protection
+    if (!localStorage.getItem('isAdminLoggedIn')) {
+        alert('You must log in first.');
+        window.location.href = 'login.html';
+        return;
+    }
+
     const tabBtns = document.querySelectorAll('.tab-btn');
     const itemsTableBody = document.getElementById('itemsTableBody');
     const claimsTableBody = document.getElementById('claimsTableBody');
@@ -85,6 +92,7 @@ document.addEventListener('DOMContentLoaded', function() {
         `).join('');
     }
 
+    // 📝 Tabs
     tabBtns.forEach(btn => {
         btn.addEventListener('click', () => {
             tabBtns.forEach(b => b.classList.remove('active'));
@@ -96,8 +104,9 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
+    // 🔍 View modals
     window.viewItemDetails = function(id) {
-        const item = allItems.find(i => i.id === id || i.id === parseInt(id));
+        const item = allItems.find(i => i.id == id);
         if (!item) return;
 
         detailContent.innerHTML = `
@@ -115,7 +124,7 @@ document.addEventListener('DOMContentLoaded', function() {
     };
 
     window.viewClaimDetails = function(id) {
-        const claim = allClaims.find(c => c.id === id || c.id === parseInt(id));
+        const claim = allClaims.find(c => c.id == id);
         if (!claim) return;
 
         detailContent.innerHTML = `
@@ -132,6 +141,7 @@ document.addEventListener('DOMContentLoaded', function() {
         detailModal.classList.add('active');
     };
 
+    // ✅ Approve / reject / delete actions
     window.approveItem = async function(id) {
         try {
             await updateItemStatus(id, 'approved');
