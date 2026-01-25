@@ -1,3 +1,4 @@
+
 document.addEventListener('DOMContentLoaded', function() {
     const form = document.getElementById('reportForm');
     const fileUpload = document.getElementById('fileUpload');
@@ -27,6 +28,7 @@ document.addEventListener('DOMContentLoaded', function() {
         e.preventDefault();
         fileUpload.style.borderColor = 'rgba(135, 186, 195, 0.5)';
         fileUpload.style.background = 'transparent';
+
         const files = e.dataTransfer.files;
         if (files.length > 0 && files[0].type.startsWith('image/')) {
             fileInput.files = files;
@@ -45,6 +47,7 @@ document.addEventListener('DOMContentLoaded', function() {
             showAlert('Image size must be less than 5MB', 'error');
             return;
         }
+
         const reader = new FileReader();
         reader.onload = (e) => {
             imagePreview.src = e.target.result;
@@ -55,7 +58,9 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function showAlert(message, type) {
         alertContainer.innerHTML = `<div class="alert alert-${type}">${message}</div>`;
-        setTimeout(() => { alertContainer.innerHTML = ''; }, 5000);
+        setTimeout(() => {
+            alertContainer.innerHTML = '';
+        }, 5000);
     }
 
     form.addEventListener('submit', async (e) => {
@@ -84,7 +89,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 status: 'pending'
             };
 
-            const newItem = await addItem(itemData); // Supabase-only
+            await addItem(itemData); // supabase.js function
 
             showAlert('Item reported successfully! It will be reviewed by an admin.', 'success');
             form.reset();
