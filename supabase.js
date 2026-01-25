@@ -1,9 +1,9 @@
+const SUPABASE_URL = window.SUPABASE_URL || 'https://doovebtkpjvkvuzfxohq.supabase.co';
+const SUPABASE_ANON_KEY = window.SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRvb3ZlYnRrcGp2a3Z1emZ4b2hxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjkyOTAxNDgsImV4cCI6MjA4NDg2NjE0OH0.WUwRsDVZ3lLlG5yWhEP4KxqZpxizouDWkfYxApRhlJ4';
+
 let supabaseClient = null;
 
 function initSupabase() {
-    const SUPABASE_URL = window.SUPABASE_URL || '';
-    const SUPABASE_ANON_KEY = window.SUPABASE_ANON_KEY || '';
-
     if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
         console.warn('Supabase credentials not configured. Using local storage fallback.');
         return null;
@@ -17,7 +17,6 @@ function initSupabase() {
     return null;
 }
 
-// Local storage fallback
 function getLocalItems() {
     const items = localStorage.getItem('lostFoundItems');
     return items ? JSON.parse(items) : [];
@@ -36,13 +35,13 @@ function saveLocalClaims(claims) {
     localStorage.setItem('lostFoundClaims', JSON.stringify(claims));
 }
 
-// Items
 async function getAllItems() {
     if (supabaseClient) {
         const { data, error } = await supabaseClient
             .from('items')
             .select('*')
             .order('created_at', { ascending: false });
+
         if (error) {
             console.error('Error fetching items:', error);
             return getLocalItems();
@@ -59,8 +58,9 @@ async function getApprovedItems() {
             .select('*')
             .eq('status', 'approved')
             .order('created_at', { ascending: false });
+
         if (error) {
-            console.error('Error fetching approved items:', error);
+            console.error('Error fetching items:', error);
             return getLocalItems().filter(item => item.status === 'approved');
         }
         return data || [];
@@ -74,6 +74,7 @@ async function addItem(item) {
             .from('items')
             .insert([item])
             .select();
+
         if (error) {
             console.error('Error adding item:', error);
             throw error;
@@ -82,7 +83,12 @@ async function addItem(item) {
     }
 
     const items = getLocalItems();
-    const newItem = { ...item, id: Date.now().toString(), created_at: new Date().toISOString(), status: 'pending' };
+    const newItem = {
+        ...item,
+        id: Date.now().toString(),
+        created_at: new Date().toISOString(),
+        status: 'pending'
+    };
     items.unshift(newItem);
     saveLocalItems(items);
     return newItem;
@@ -95,6 +101,7 @@ async function updateItemStatus(id, status) {
             .update({ status })
             .eq('id', id)
             .select();
+
         if (error) {
             console.error('Error updating item:', error);
             throw error;
@@ -119,6 +126,7 @@ async function deleteItem(id) {
             .from('items')
             .delete()
             .eq('id', id);
+
         if (error) {
             console.error('Error deleting item:', error);
             throw error;
@@ -133,13 +141,13 @@ async function deleteItem(id) {
     return true;
 }
 
-// Claims
 async function addClaim(claim) {
     if (supabaseClient) {
         const { data, error } = await supabaseClient
             .from('claims')
             .insert([claim])
             .select();
+
         if (error) {
             console.error('Error adding claim:', error);
             throw error;
@@ -148,7 +156,12 @@ async function addClaim(claim) {
     }
 
     const claims = getLocalClaims();
-    const newClaim = { ...claim, id: Date.now().toString(), created_at: new Date().toISOString(), status: 'pending' };
+    const newClaim = {
+        ...claim,
+        id: Date.now().toString(),
+        created_at: new Date().toISOString(),
+        status: 'pending'
+    };
     claims.unshift(newClaim);
     saveLocalClaims(claims);
     return newClaim;
@@ -160,6 +173,7 @@ async function getAllClaims() {
             .from('claims')
             .select('*')
             .order('created_at', { ascending: false });
+
         if (error) {
             console.error('Error fetching claims:', error);
             return getLocalClaims();
@@ -176,6 +190,7 @@ async function updateClaimStatus(id, status) {
             .update({ status })
             .eq('id', id)
             .select();
+
         if (error) {
             console.error('Error updating claim:', error);
             throw error;
@@ -194,24 +209,25 @@ async function updateClaimStatus(id, status) {
     throw new Error('Claim not found');
 }
 
-// Upload image
 async function uploadImage(file) {
     if (supabaseClient) {
         const fileName = `${Date.now()}-${file.name}`;
         const { data, error } = await supabaseClient.storage
             .from('item-images')
             .upload(fileName, file);
+
         if (error) {
             console.error('Error uploading image:', error);
             throw error;
         }
+
         const { data: urlData } = supabaseClient.storage
             .from('item-images')
             .getPublicUrl(fileName);
+
         return urlData.publicUrl;
     }
 
-    // Local fallback
     return new Promise((resolve) => {
         const reader = new FileReader();
         reader.onloadend = () => resolve(reader.result);
@@ -219,5 +235,4 @@ async function uploadImage(file) {
     });
 }
 
-// Initialize
 initSupabase();
