@@ -89,6 +89,7 @@ document.addEventListener('DOMContentLoaded', function() {
             };
 
             await addItem(itemData);
+
             showAlert('Item reported successfully! It will be reviewed by an admin.', 'success');
             form.reset();
             imagePreview.style.display = 'none';
