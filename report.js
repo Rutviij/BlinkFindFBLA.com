@@ -1,4 +1,3 @@
-
 document.addEventListener('DOMContentLoaded', function() {
     const form = document.getElementById('reportForm');
     const fileUpload = document.getElementById('fileUpload');
@@ -89,8 +88,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 status: 'pending'
             };
 
-            await addItem(itemData); // supabase.js function
-
+            await addItem(itemData);
             showAlert('Item reported successfully! It will be reviewed by an admin.', 'success');
             form.reset();
             imagePreview.style.display = 'none';
