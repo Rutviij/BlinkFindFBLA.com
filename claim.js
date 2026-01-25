@@ -13,17 +13,17 @@ document.addEventListener('DOMContentLoaded', function() {
 
     async function loadItems() {
         try {
-            allItems = await getApprovedItems(); // Supabase-only
+            allItems = await getApprovedItems(); // supabase.js function
             renderItems(allItems);
         } catch (error) {
             console.error('Error loading items:', error);
-            itemsContainer.innerHTML = '<div class="empty-state"><div class="empty-state-icon">😕</div><p>Error loading items. Please refresh the page.</p></div>';
+            itemsContainer.innerHTML = '<div class="empty-state"><p>Error loading items. Please refresh the page.</p></div>';
         }
     }
 
     function renderItems(items) {
         if (items.length === 0) {
-            itemsContainer.innerHTML = '<div class="empty-state"><div class="empty-state-icon">📭</div><h3>No items found</h3><p>Check back later or try a different search.</p></div>';
+            itemsContainer.innerHTML = '<div class="empty-state"><p>No items available.</p></div>';
             return;
         }
 
@@ -31,18 +31,17 @@ document.addEventListener('DOMContentLoaded', function() {
             <div class="item-card">
                 ${item.image_url
                     ? `<img src="${item.image_url}" alt="${item.name}" class="item-image">`
-                    : `<div class="item-image" style="display: flex; align-items: center; justify-content: center; font-size: 50px;">📦</div>`
-                }
+                    : `<div class="item-image" style="display:flex; align-items:center; justify-content:center; font-size:50px;">📦</div>`}
                 <div class="item-details">
                     <h3>${escapeHtml(item.name)}</h3>
                     <p><strong>Category:</strong> ${escapeHtml(item.category)}</p>
-                    <p><strong>Location Found:</strong> ${escapeHtml(item.location)}</p>
+                    <p><strong>Location:</strong> ${escapeHtml(item.location)}</p>
                     <p>${escapeHtml(item.description.substring(0, 100))}${item.description.length > 100 ? '...' : ''}</p>
                     <div class="item-meta">
                         <span class="item-date">Found: ${formatDate(item.date_found)}</span>
                         <span class="item-status status-available">Available</span>
                     </div>
-                    <button class="btn btn-primary" style="width: 100%; margin-top: 15px;" onclick="openClaimModal('${item.id}', '${escapeHtml(item.name)}')">Claim This Item</button>
+                    <button class="btn btn-primary" style="width:100%; margin-top:15px;" onclick="openClaimModal('${item.id}', '${escapeHtml(item.name)}')">Claim This Item</button>
                 </div>
             </div>
         `).join('');
@@ -51,6 +50,7 @@ document.addEventListener('DOMContentLoaded', function() {
     function filterItems() {
         const searchTerm = searchInput.value.toLowerCase();
         const category = categoryFilter.value;
+
         const filtered = allItems.filter(item => {
             const matchesSearch = item.name.toLowerCase().includes(searchTerm) ||
                                   item.description.toLowerCase().includes(searchTerm) ||
@@ -58,6 +58,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const matchesCategory = !category || item.category === category;
             return matchesSearch && matchesCategory;
         });
+
         renderItems(filtered);
     }
 
@@ -89,6 +90,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     claimForm.addEventListener('submit', async (e) => {
         e.preventDefault();
+
         const submitBtn = claimForm.querySelector('button[type="submit"]');
         const originalText = submitBtn.textContent;
         submitBtn.textContent = 'Submitting...';
@@ -105,7 +107,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 status: 'pending'
             };
 
-            await addClaim(claimData); // Supabase-only
+            await addClaim(claimData); // supabase.js function
 
             modalAlertContainer.innerHTML = '<div class="alert alert-success">Claim submitted successfully! You will be contacted soon.</div>';
             claimForm.reset();
@@ -126,9 +128,8 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     function escapeHtml(text) {
-        if (!text) return '';
         const div = document.createElement('div');
-        div.textContent = text;
+        div.textContent = text || '';
         return div.innerHTML;
     }
 
