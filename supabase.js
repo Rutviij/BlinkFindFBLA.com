@@ -1,238 +1,148 @@
-const SUPABASE_URL = window.SUPABASE_URL || 'https://doovebtkpjvkvuzfxohq.supabase.co';
-const SUPABASE_ANON_KEY = window.SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRvb3ZlYnRrcGp2a3Z1emZ4b2hxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjkyOTAxNDgsImV4cCI6MjA4NDg2NjE0OH0.WUwRsDVZ3lLlG5yWhEP4KxqZpxizouDWkfYxApRhlJ4';
+// Simple client wrapper that calls the Python API
+const API_BASE = window.API_BASE || (location.protocol + '//' + location.hostname + ':4000');
 
-let supabaseClient = null;
-
-function initSupabase() {
-    if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
-        console.warn('Supabase credentials not configured. Using local storage fallback.');
-        return null;
-    }
-
-    if (typeof supabase !== 'undefined') {
-        supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-        return supabaseClient;
-    }
-
-    return null;
-}
-
-function getLocalItems() {
-    const items = localStorage.getItem('lostFoundItems');
-    return items ? JSON.parse(items) : [];
-}
-
-function saveLocalItems(items) {
-    localStorage.setItem('lostFoundItems', JSON.stringify(items));
-}
-
-function getLocalClaims() {
-    const claims = localStorage.getItem('lostFoundClaims');
-    return claims ? JSON.parse(claims) : [];
-}
-
-function saveLocalClaims(claims) {
-    localStorage.setItem('lostFoundClaims', JSON.stringify(claims));
+async function safeFetch(url, options = {}) {
+  const res = await fetch(url, options);
+  if (!res.ok) {
+    const text = await res.text();
+    throw new Error(`HTTP ${res.status} - ${text}`);
+  }
+  return res.json();
 }
 
 async function getAllItems() {
-    if (supabaseClient) {
-        const { data, error } = await supabaseClient
-            .from('items')
-            .select('*')
-            .order('created_at', { ascending: false });
-
-        if (error) {
-            console.error('Error fetching items:', error);
-            return getLocalItems();
-        }
-        return data || [];
-    }
-    return getLocalItems();
+  try {
+    return await safeFetch(`${API_BASE}/api/items`);
+  } catch (e) {
+    const ls = localStorage.getItem('lostFoundItems');
+    return ls ? JSON.parse(ls) : [];
+  }
 }
 
 async function getApprovedItems() {
-    if (supabaseClient) {
-        const { data, error } = await supabaseClient
-            .from('items')
-            .select('*')
-            .eq('status', 'approved')
-            .order('created_at', { ascending: false });
-
-        if (error) {
-            console.error('Error fetching items:', error);
-            return getLocalItems().filter(item => item.status === 'approved');
-        }
-        return data || [];
-    }
-    return getLocalItems().filter(item => item.status === 'approved');
+  try {
+    return await safeFetch(`${API_BASE}/api/items/approved`);
+  } catch (e) {
+    const ls = localStorage.getItem('lostFoundItems');
+    return (ls ? JSON.parse(ls) : []).filter(i => i.status === 'approved');
+  }
 }
 
 async function addItem(item) {
-    if (supabaseClient) {
-        const { data, error } = await supabaseClient
-            .from('items')
-            .insert([item])
-            .select();
-
-        if (error) {
-            console.error('Error adding item:', error);
-            throw error;
-        }
-        return data[0];
-    }
-
-    const items = getLocalItems();
-    const newItem = {
-        ...item,
-        id: Date.now().toString(),
-        created_at: new Date().toISOString(),
-        status: 'pending'
-    };
+  try {
+    return await safeFetch(`${API_BASE}/api/items`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(item)
+    });
+  } catch (e) {
+    // local fallback
+    const items = JSON.parse(localStorage.getItem('lostFoundItems') || '[]');
+    const newItem = { ...item, id: String(Date.now()), created_at: new Date().toISOString(), status: 'pending' };
     items.unshift(newItem);
-    saveLocalItems(items);
+    localStorage.setItem('lostFoundItems', JSON.stringify(items));
     return newItem;
+  }
 }
 
 async function updateItemStatus(id, status) {
-    if (supabaseClient) {
-        const { data, error } = await supabaseClient
-            .from('items')
-            .update({ status })
-            .eq('id', id)
-            .select();
-
-        if (error) {
-            console.error('Error updating item:', error);
-            throw error;
-        }
-        return data[0];
+  try {
+    return await safeFetch(`${API_BASE}/api/items/${id}/status`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ status })
+    });
+  } catch (e) {
+    const items = JSON.parse(localStorage.getItem('lostFoundItems') || '[]');
+    const idx = items.findIndex(it => String(it.id) === String(id));
+    if (idx !== -1) {
+      items[idx].status = status;
+      localStorage.setItem('lostFoundItems', JSON.stringify(items));
+      return items[idx];
     }
-
-    const items = getLocalItems();
-    const idStr = String(id);
-    const index = items.findIndex(item => String(item.id) === idStr);
-    if (index !== -1) {
-        items[index].status = status;
-        saveLocalItems(items);
-        return items[index];
-    }
-    throw new Error('Item not found');
+    throw e;
+  }
 }
 
 async function deleteItem(id) {
-    if (supabaseClient) {
-        const { error } = await supabaseClient
-            .from('items')
-            .delete()
-            .eq('id', id);
-
-        if (error) {
-            console.error('Error deleting item:', error);
-            throw error;
-        }
-        return true;
-    }
-
-    const items = getLocalItems();
-    const idStr = String(id);
-    const filtered = items.filter(item => String(item.id) !== idStr);
-    saveLocalItems(filtered);
-    return true;
+  try {
+    return await safeFetch(`${API_BASE}/api/items/${id}`, { method: 'DELETE' });
+  } catch (e) {
+    const items = JSON.parse(localStorage.getItem('lostFoundItems') || '[]');
+    const filtered = items.filter(it => String(it.id) !== String(id));
+    localStorage.setItem('lostFoundItems', JSON.stringify(filtered));
+    return { success: true };
+  }
 }
 
 async function addClaim(claim) {
-    if (supabaseClient) {
-        const { data, error } = await supabaseClient
-            .from('claims')
-            .insert([claim])
-            .select();
-
-        if (error) {
-            console.error('Error adding claim:', error);
-            throw error;
-        }
-        return data[0];
-    }
-
-    const claims = getLocalClaims();
-    const newClaim = {
-        ...claim,
-        id: Date.now().toString(),
-        created_at: new Date().toISOString(),
-        status: 'pending'
-    };
+  try {
+    return await safeFetch(`${API_BASE}/api/claims`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(claim)
+    });
+  } catch (e) {
+    const claims = JSON.parse(localStorage.getItem('lostFoundClaims') || '[]');
+    const newClaim = { ...claim, id: String(Date.now()), created_at: new Date().toISOString(), status: 'pending' };
     claims.unshift(newClaim);
-    saveLocalClaims(claims);
+    localStorage.setItem('lostFoundClaims', JSON.stringify(claims));
     return newClaim;
+  }
 }
 
 async function getAllClaims() {
-    if (supabaseClient) {
-        const { data, error } = await supabaseClient
-            .from('claims')
-            .select('*')
-            .order('created_at', { ascending: false });
-
-        if (error) {
-            console.error('Error fetching claims:', error);
-            return getLocalClaims();
-        }
-        return data || [];
-    }
-    return getLocalClaims();
+  try {
+    return await safeFetch(`${API_BASE}/api/claims`);
+  } catch (e) {
+    return JSON.parse(localStorage.getItem('lostFoundClaims') || '[]');
+  }
 }
 
 async function updateClaimStatus(id, status) {
-    if (supabaseClient) {
-        const { data, error } = await supabaseClient
-            .from('claims')
-            .update({ status })
-            .eq('id', id)
-            .select();
-
-        if (error) {
-            console.error('Error updating claim:', error);
-            throw error;
-        }
-        return data[0];
+  try {
+    return await safeFetch(`${API_BASE}/api/claims/${id}/status`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ status })
+    });
+  } catch (e) {
+    const claims = JSON.parse(localStorage.getItem('lostFoundClaims') || '[]');
+    const idx = claims.findIndex(c => String(c.id) === String(id));
+    if (idx !== -1) {
+      claims[idx].status = status;
+      localStorage.setItem('lostFoundClaims', JSON.stringify(claims));
+      return claims[idx];
     }
-
-    const claims = getLocalClaims();
-    const idStr = String(id);
-    const index = claims.findIndex(claim => String(claim.id) === idStr);
-    if (index !== -1) {
-        claims[index].status = status;
-        saveLocalClaims(claims);
-        return claims[index];
-    }
-    throw new Error('Claim not found');
+    throw e;
+  }
 }
 
 async function uploadImage(file) {
-    if (supabaseClient) {
-        const fileName = `${Date.now()}-${file.name}`;
-        const { data, error } = await supabaseClient.storage
-            .from('item-images')
-            .upload(fileName, file);
-
-        if (error) {
-            console.error('Error uploading image:', error);
-            throw error;
-        }
-
-        const { data: urlData } = supabaseClient.storage
-            .from('item-images')
-            .getPublicUrl(fileName);
-
-        return urlData.publicUrl;
-    }
-
-    return new Promise((resolve) => {
-        const reader = new FileReader();
-        reader.onloadend = () => resolve(reader.result);
-        reader.readAsDataURL(file);
+  try {
+    const fd = new FormData();
+    fd.append('file', file);
+    const res = await fetch(`${API_BASE}/api/upload`, { method: 'POST', body: fd });
+    if (!res.ok) throw new Error('Upload failed');
+    const data = await res.json();
+    return data.publicUrl;
+  } catch (e) {
+    // fallback to base64
+    return await new Promise((resolve) => {
+      const reader = new FileReader();
+      reader.onloadend = () => resolve(reader.result);
+      reader.readAsDataURL(file);
     });
+  }
 }
 
-initSupabase();
+// Expose functions globally (old code expects global functions)
+window.getAllItems = getAllItems;
+window.getApprovedItems = getApprovedItems;
+window.addItem = addItem;
+window.updateItemStatus = updateItemStatus;
+window.deleteItem = deleteItem;
+window.addClaim = addClaim;
+window.getAllClaims = getAllClaims;
+window.updateClaimStatus = updateClaimStatus;
+window.uploadImage = uploadImage;
