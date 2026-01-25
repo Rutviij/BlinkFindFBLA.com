@@ -10,23 +10,12 @@ document.addEventListener('DOMContentLoaded', function() {
     let allItems = [];
     let allClaims = [];
 
-    // Initial load
     loadData();
-
-    // Auto-refresh every 5 seconds to capture new localStorage items/claims
-    setInterval(loadData, 5000);
 
     async function loadData() {
         try {
-            // Use Supabase if available, otherwise fallback to localStorage
-            if (supabaseClient) {
-                allItems = await getAllItems();
-                allClaims = await getAllClaims();
-            } else {
-                allItems = getLocalItems();
-                allClaims = getLocalClaims();
-            }
-
+            allItems = await getAllItems();
+            allClaims = await getAllClaims();
             updateStats();
             renderItems();
             renderClaims();
@@ -61,7 +50,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 <td><span class="item-status status-${item.status}">${capitalize(item.status)}</span></td>
                 <td>
                     <div class="admin-actions">
-                        <button class="btn-small btn-view" onclick="viewItemDetails('${item.id}')">View</button>
+                        <button class="btn-small btn-approve" onclick="viewItemDetails('${item.id}')">View</button>
                         ${item.status === 'pending' ? `<button class="btn-small btn-approve" onclick="approveItem('${item.id}')">Approve</button>` : ''}
                         <button class="btn-small btn-delete" onclick="deleteItemConfirm('${item.id}')">Delete</button>
                     </div>
@@ -85,7 +74,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 <td><span class="item-status status-${claim.status}">${capitalize(claim.status)}</span></td>
                 <td>
                     <div class="admin-actions">
-                        <button class="btn-small btn-view" onclick="viewClaimDetails('${claim.id}')">View</button>
+                        <button class="btn-small btn-approve" onclick="viewClaimDetails('${claim.id}')">View</button>
                         ${claim.status === 'pending' ? `
                             <button class="btn-small btn-approve" onclick="approveClaim('${claim.id}')">Approve</button>
                             <button class="btn-small btn-delete" onclick="rejectClaim('${claim.id}')">Reject</button>
@@ -96,7 +85,6 @@ document.addEventListener('DOMContentLoaded', function() {
         `).join('');
     }
 
-    // Tab switching
     tabBtns.forEach(btn => {
         btn.addEventListener('click', () => {
             tabBtns.forEach(b => b.classList.remove('active'));
@@ -108,7 +96,6 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
-    // View item details
     window.viewItemDetails = function(id) {
         const item = allItems.find(i => i.id === id || i.id === parseInt(id));
         if (!item) return;
@@ -127,7 +114,6 @@ document.addEventListener('DOMContentLoaded', function() {
         detailModal.classList.add('active');
     };
 
-    // View claim details
     window.viewClaimDetails = function(id) {
         const claim = allClaims.find(c => c.id === id || c.id === parseInt(id));
         if (!claim) return;
@@ -146,7 +132,6 @@ document.addEventListener('DOMContentLoaded', function() {
         detailModal.classList.add('active');
     };
 
-    // Approve/Delete Items
     window.approveItem = async function(id) {
         try {
             await updateItemStatus(id, 'approved');
@@ -171,7 +156,6 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     };
 
-    // Approve/Reject Claims
     window.approveClaim = async function(id) {
         try {
             await updateClaimStatus(id, 'approved');
@@ -196,7 +180,6 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     };
 
-    // Modal close
     closeDetailModal.addEventListener('click', () => {
         detailModal.classList.remove('active');
     });
@@ -207,7 +190,6 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    // Helpers
     function showAlert(message, type) {
         alertContainer.innerHTML = `<div class="alert alert-${type}">${message}</div>`;
         setTimeout(() => {
