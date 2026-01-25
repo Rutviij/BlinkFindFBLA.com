@@ -1,6 +1,3 @@
-// claim.js
-import { getApprovedItems, addClaim } from './supabase.js';
-
 document.addEventListener('DOMContentLoaded', function() {
     const itemsContainer = document.getElementById('itemsContainer');
     const searchInput = document.getElementById('searchInput');
@@ -12,34 +9,40 @@ document.addEventListener('DOMContentLoaded', function() {
 
     let allItems = [];
 
+    loadItems();
+
     async function loadItems() {
         try {
-            allItems = await getApprovedItems();
+            allItems = await getApprovedItems(); // Supabase-only
             renderItems(allItems);
-        } catch (err) {
-            console.error(err);
-            itemsContainer.innerHTML = '<div class="empty-state"><div class="empty-state-icon">😕</div><p>Error loading items.</p></div>';
+        } catch (error) {
+            console.error('Error loading items:', error);
+            itemsContainer.innerHTML = '<div class="empty-state"><div class="empty-state-icon">😕</div><p>Error loading items. Please refresh the page.</p></div>';
         }
     }
 
     function renderItems(items) {
-        if (!items.length) {
-            itemsContainer.innerHTML = '<div class="empty-state"><div class="empty-state-icon">📭</div><h3>No items found</h3></div>';
+        if (items.length === 0) {
+            itemsContainer.innerHTML = '<div class="empty-state"><div class="empty-state-icon">📭</div><h3>No items found</h3><p>Check back later or try a different search.</p></div>';
             return;
         }
+
         itemsContainer.innerHTML = items.map(item => `
             <div class="item-card">
-                ${item.image_url ? `<img src="${item.image_url}" class="item-image">` : `<div class="item-image">📦</div>`}
+                ${item.image_url
+                    ? `<img src="${item.image_url}" alt="${item.name}" class="item-image">`
+                    : `<div class="item-image" style="display: flex; align-items: center; justify-content: center; font-size: 50px;">📦</div>`
+                }
                 <div class="item-details">
                     <h3>${escapeHtml(item.name)}</h3>
                     <p><strong>Category:</strong> ${escapeHtml(item.category)}</p>
-                    <p><strong>Location:</strong> ${escapeHtml(item.location)}</p>
-                    <p>${escapeHtml(item.description.substring(0,100))}${item.description.length>100?'...':''}</p>
+                    <p><strong>Location Found:</strong> ${escapeHtml(item.location)}</p>
+                    <p>${escapeHtml(item.description.substring(0, 100))}${item.description.length > 100 ? '...' : ''}</p>
                     <div class="item-meta">
                         <span class="item-date">Found: ${formatDate(item.date_found)}</span>
                         <span class="item-status status-available">Available</span>
                     </div>
-                    <button class="btn btn-primary" style="width:100%" onclick="openClaimModal('${item.id}','${escapeHtml(item.name)}')">Claim This Item</button>
+                    <button class="btn btn-primary" style="width: 100%; margin-top: 15px;" onclick="openClaimModal('${item.id}', '${escapeHtml(item.name)}')">Claim This Item</button>
                 </div>
             </div>
         `).join('');
@@ -48,7 +51,14 @@ document.addEventListener('DOMContentLoaded', function() {
     function filterItems() {
         const searchTerm = searchInput.value.toLowerCase();
         const category = categoryFilter.value;
-        renderItems(allItems.filter(i => (i.name.toLowerCase().includes(searchTerm) || i.description.toLowerCase().includes(searchTerm) || i.location.toLowerCase().includes(searchTerm)) && (!category || i.category === category)));
+        const filtered = allItems.filter(item => {
+            const matchesSearch = item.name.toLowerCase().includes(searchTerm) ||
+                                  item.description.toLowerCase().includes(searchTerm) ||
+                                  item.location.toLowerCase().includes(searchTerm);
+            const matchesCategory = !category || item.category === category;
+            return matchesSearch && matchesCategory;
+        });
+        renderItems(filtered);
     }
 
     searchInput.addEventListener('input', filterItems);
@@ -61,17 +71,31 @@ document.addEventListener('DOMContentLoaded', function() {
         document.body.style.overflow = 'hidden';
     };
 
-    closeModal.addEventListener('click', () => { claimModal.classList.remove('active'); document.body.style.overflow = ''; claimForm.reset(); modalAlertContainer.innerHTML = ''; });
-    claimModal.addEventListener('click', e => { if(e.target===claimModal){ claimModal.classList.remove('active'); document.body.style.overflow=''; claimForm.reset(); modalAlertContainer.innerHTML=''; } });
+    closeModal.addEventListener('click', () => {
+        claimModal.classList.remove('active');
+        document.body.style.overflow = '';
+        claimForm.reset();
+        modalAlertContainer.innerHTML = '';
+    });
 
-    claimForm.addEventListener('submit', async e => {
+    claimModal.addEventListener('click', (e) => {
+        if (e.target === claimModal) {
+            claimModal.classList.remove('active');
+            document.body.style.overflow = '';
+            claimForm.reset();
+            modalAlertContainer.innerHTML = '';
+        }
+    });
+
+    claimForm.addEventListener('submit', async (e) => {
         e.preventDefault();
         const submitBtn = claimForm.querySelector('button[type="submit"]');
         const originalText = submitBtn.textContent;
-        submitBtn.textContent = 'Submitting...'; submitBtn.disabled = true;
+        submitBtn.textContent = 'Submitting...';
+        submitBtn.disabled = true;
 
         try {
-            await addClaim({
+            const claimData = {
                 item_id: document.getElementById('claimItemId').value,
                 item_name: document.getElementById('claimItemName').value,
                 claimant_name: document.getElementById('claimantName').value,
@@ -79,18 +103,38 @@ document.addEventListener('DOMContentLoaded', function() {
                 claimant_phone: document.getElementById('claimantPhone').value,
                 description: document.getElementById('claimDescription').value,
                 status: 'pending'
-            });
-            modalAlertContainer.innerHTML = '<div class="alert alert-success">Claim submitted successfully!</div>';
+            };
+
+            await addClaim(claimData); // Supabase-only
+
+            modalAlertContainer.innerHTML = '<div class="alert alert-success">Claim submitted successfully! You will be contacted soon.</div>';
             claimForm.reset();
-            setTimeout(() => { claimModal.classList.remove('active'); document.body.style.overflow=''; modalAlertContainer.innerHTML=''; }, 2000);
-        } catch(err) {
-            console.error(err);
-            modalAlertContainer.innerHTML = '<div class="alert alert-error">Error submitting claim.</div>';
-        } finally { submitBtn.textContent = originalText; submitBtn.disabled=false; }
+
+            setTimeout(() => {
+                claimModal.classList.remove('active');
+                document.body.style.overflow = '';
+                modalAlertContainer.innerHTML = '';
+            }, 2000);
+
+        } catch (error) {
+            console.error('Error submitting claim:', error);
+            modalAlertContainer.innerHTML = '<div class="alert alert-error">Error submitting claim. Please try again.</div>';
+        } finally {
+            submitBtn.textContent = originalText;
+            submitBtn.disabled = false;
+        }
     });
 
-    function escapeHtml(text){ const div=document.createElement('div'); div.textContent=text; return div.innerHTML; }
-    function formatDate(dateString){ return new Date(dateString).toLocaleDateString('en-US',{year:'numeric',month:'short',day:'numeric'}); }
+    function escapeHtml(text) {
+        if (!text) return '';
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+    }
 
-    loadItems();
+    function formatDate(dateString) {
+        if (!dateString) return 'N/A';
+        const options = { year: 'numeric', month: 'short', day: 'numeric' };
+        return new Date(dateString).toLocaleDateString('en-US', options);
+    }
 });
